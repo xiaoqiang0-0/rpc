@@ -1,12 +1,18 @@
-package com.xiaoqiang.rpc;
+package com.xiaoqiang.rpc.dto;
 
+
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RpcRequest {
+    public static final AtomicInteger ID_GENERATOR = new AtomicInteger(0);
     private int id;
     private String service;
     private String methodName;
-    private Class[] argsTypes;
     private Object[] args;
+
+    public RpcRequest() {
+    }
 
     public int getId() {
         return id;
@@ -32,19 +38,21 @@ public class RpcRequest {
         this.methodName = methodName;
     }
 
-    public Class[] getArgsTypes() {
-        return argsTypes;
-    }
-
-    public void setArgsTypes(Class[] argsTypes) {
-        this.argsTypes = argsTypes;
-    }
-
     public Object[] getArgs() {
         return args;
     }
 
     public void setArgs(Object[] args) {
         this.args = args;
+    }
+
+    @Override
+    public String toString() {
+        return "RpcRequest{" +
+                "id=" + id +
+                ", service='" + service + '\'' +
+                ", methodName='" + methodName + '\'' +
+                ", args=" + Arrays.toString(args) +
+                '}';
     }
 }

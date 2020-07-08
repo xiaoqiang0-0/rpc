@@ -1,4 +1,4 @@
-package com.xiaoqiang.rpc;
+package com.xiaoqiang.rpc.dto;
 
 
 public class RpcResponse {
@@ -37,5 +37,15 @@ public class RpcResponse {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    @Override
+    public String toString() {
+        return "RpcResponse{" +
+                "id=" + id +
+                ", state=" + state +
+                ", result=" + result +
+                ", msg='" + msg + '\'' +
+                '}';
     }
 }

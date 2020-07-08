@@ -1,7 +1,5 @@
-package com.xiaoqiang.rpc.proxy;
+package com.xiaoqiang.rpc.client;
 
-import com.xiaoqiang.rpc.RpcRequest;
-import com.xiaoqiang.rpc.RpcResponse;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -12,7 +10,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 public class RpcClient {
     private EventLoopGroup executors;
     private Bootstrap bootstrap;
-    private RpcInvokeHandler rpcInvokeHandler;
+    private RpcClientTransactionHandler rpcInvokeHandler;
 
     public RpcClient(String host, int port) {
         executors = new NioEventLoopGroup();
@@ -20,7 +18,7 @@ public class RpcClient {
         bootstrap.group(executors);
         bootstrap.channel(NioSocketChannel.class);
         bootstrap.remoteAddress(host, port);
-        rpcInvokeHandler = new RpcInvokeHandler();
+        rpcInvokeHandler = new RpcClientTransactionHandler();
         bootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
@@ -32,13 +30,13 @@ public class RpcClient {
 
     public void initConnect() {
         try {
-            bootstrap.connect().sync().channel().closeFuture().sync();
+            bootstrap.connect().sync();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void close(){
+    public void close() {
         try {
             executors.shutdownGracefully().sync();
         } catch (InterruptedException e) {
@@ -46,8 +44,7 @@ public class RpcClient {
         }
     }
 
-    public RpcResponse rpcInvoke(RpcRequest request) {
-        rpcInvokeHandler.sendRequest(request);
-        return null;
+    public <T> T get(Class<T> c) {
+        return ClientProxyFactory.get(c, rpcInvokeHandler);
     }
 }

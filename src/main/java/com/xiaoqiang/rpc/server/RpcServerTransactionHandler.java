@@ -6,6 +6,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.function.Function;
@@ -15,6 +17,7 @@ import static com.xiaoqiang.rpc.dto.DtoUtils.toRequest;
 
 @ChannelHandler.Sharable
 public class RpcServerTransactionHandler extends SimpleChannelInboundHandler<ByteBuf> {
+    private final Logger logger = LoggerFactory.getLogger(RpcServerTransactionHandler.class);
 
     private final Function<String, Object> serviceFinder;
 
@@ -25,10 +28,10 @@ public class RpcServerTransactionHandler extends SimpleChannelInboundHandler<Byt
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         RpcRequest request = toRequest(msg);
-        System.out.printf("收到来自客户端的消息：[%s]\n", request);
+        logger.debug("收到来自客户端的消息：[{}]", request);
         if (request != null) {
             RpcResponse response = doRequest(request);
-            System.out.printf("服务端处理结果：[%s]\n", response);
+            logger.debug("服务端处理结果：[{}]", response);
             ctx.writeAndFlush(toByteBuf(response));
         }
     }
@@ -38,11 +41,7 @@ public class RpcServerTransactionHandler extends SimpleChannelInboundHandler<Byt
         RpcResponse response = new RpcResponse();
         response.setId(request.getId());
         try {
-            Class<?>[] argTypes = new Class[request.getArgs().length];
-            for (int i = 0; i < request.getArgs().length; i++) {
-                argTypes[i] = request.getArgs()[i].getClass();
-            }
-            Method method = service.getClass().getMethod(request.getMethodName(), argTypes);
+            Method method = service.getClass().getMethod(request.getMethodName(), request.getArgTypes());
             Object result = method.invoke(service, request.getArgs());
             response.setResult(result);
             response.setState(1);

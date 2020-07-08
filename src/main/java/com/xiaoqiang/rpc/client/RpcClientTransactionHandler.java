@@ -7,6 +7,8 @@ import com.xiaoqiang.rpc.dto.RpcResponse;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 
 
 public class RpcClientTransactionHandler extends SimpleChannelInboundHandler<ByteBuf> {
+    private final Logger logger = LoggerFactory.getLogger(RpcClientTransactionHandler.class);
 
     private ChannelHandlerContext context;
     private final ConcurrentMap<Integer, CompletableFuture<RpcResponse>> futureConcurrentMap = new ConcurrentHashMap<>();
@@ -34,8 +37,7 @@ public class RpcClientTransactionHandler extends SimpleChannelInboundHandler<Byt
     }
 
     public CompletableFuture<RpcResponse> sendRpcRequest(RpcRequest request) throws JsonProcessingException {
-
-        System.out.printf("发送消息至服务端：[%s]\n", request);
+        logger.debug("发送消息至服务端：[{}]", request);
         context.writeAndFlush(DtoUtils.toByteBuf(request));
         CompletableFuture<RpcResponse> future = new CompletableFuture<>();
         futureConcurrentMap.put(request.getId(), future);

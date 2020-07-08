@@ -9,6 +9,7 @@ public class RpcRequest {
     private int id;
     private String service;
     private String methodName;
+    private Class<?>[] argTypes;
     private Object[] args;
 
     public RpcRequest() {
@@ -36,6 +37,14 @@ public class RpcRequest {
 
     public void setMethodName(String methodName) {
         this.methodName = methodName;
+    }
+
+    public Class<?>[] getArgTypes() {
+        return argTypes;
+    }
+
+    public void setArgTypes(Class<?>[] argTypes) {
+        this.argTypes = argTypes;
     }
 
     public Object[] getArgs() {

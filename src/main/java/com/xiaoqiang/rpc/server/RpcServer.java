@@ -6,11 +6,14 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class RpcServer {
+    private final Logger logger = LoggerFactory.getLogger(RpcServer.class);
     private final ConcurrentMap<String, Object> servicePool = new ConcurrentHashMap<>();
     private final RpcServerTransactionHandler transactionHandler;
     private final NioEventLoopGroup executors;
@@ -43,9 +46,9 @@ public class RpcServer {
         this.successStartFuture = serverBootstrap.bind(host, port).sync();
         this.successStartFuture.addListener(future -> {
             if (future.isSuccess()) {
-                System.out.println("server start...");
+                logger.info("server start...");
             } else {
-                System.err.println("server start failed!");
+                logger.error("server start failed!");
             }
         });
     }
@@ -54,9 +57,9 @@ public class RpcServer {
         try {
             executors.shutdownGracefully().sync().addListener(future -> {
                 if (future.isSuccess()) {
-                    System.out.println("Server is shutdown!");
+                    logger.info("Server is shutdown!");
                 } else {
-                    System.err.println("Server shutdown failed!");
+                    logger.error("Server shutdown failed!");
                 }
             });
         } catch (InterruptedException e) {

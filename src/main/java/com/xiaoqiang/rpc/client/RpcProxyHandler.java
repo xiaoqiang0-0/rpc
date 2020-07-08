@@ -23,6 +23,7 @@ public class RpcProxyHandler implements InvocationHandler {
         RpcRequest request = new RpcRequest();
         request.setService(serviceName);
         request.setMethodName(method.getName());
+        request.setArgTypes(method.getParameterTypes());
         request.setArgs(args);
         CompletableFuture<RpcResponse> future = transactionHandler.sendRpcRequest(request);
         RpcResponse response = future.get(10, TimeUnit.SECONDS);
